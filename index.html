@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NYOTA</title>
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="192x192" href="icons/icon.192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="icons/icon.512.png" />
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        :root {
+            /* KCB-inspired brighter green */
+            --primary: #009a44;
+            --primary-light: #33b864;
+            --primary-dark: #007a33;
+            --accent: #c8102e;
+            --background: #f5f9f5;
+            --card-bg: #ffffff;
+            --text: #1a1a1a;
+            --text-light: #666666;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 8px 28px rgba(0, 154, 68, 0.20);
+            --border-radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--background) 0%, #e6f0e8 100%);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            padding: 16px 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 0 16px;
+            flex: 1;
+        }
+
+        /* ---------- HEADER ---------- */
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+            position: relative;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--card-bg) 0%, #f6faf7 100%);
+            padding: 14px 28px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 12px;
+            border: 1px solid rgba(0, 154, 68, 0.12);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .logo-text::after {
+            content: '®';
+            font-size: 0.7rem;
+            font-weight: 600;
+            -webkit-text-fill-color: var(--primary);
+            color: var(--primary);
+            vertical-align: super;
+            margin-left: 2px;
+        }
+
+        .tagline {
+            color: var(--text);
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-top: 8px;
+            padding: 8px 20px;
+            background: rgba(0, 154, 68, 0.08);
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        .tagline::before {
+            content: "◆ ";
+            color: var(--primary);
+            opacity: 0.7;
+        }
+
+        .tagline::after {
+            content: " ◆";
+            color: var(--primary);
+            opacity: 0.7;
+        }
+
+        /* ---------- LOADING POPUP ---------- */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 16px;
+            backdrop-filter: blur(3px);
+        }
+
+        .loading-popup {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 32px 24px;
+            box-shadow: var(--shadow-hover);
+            text-align: center;
+            max-width: 280px;
+            width: 100%;
+            margin: 0 auto;
+            border: 1px solid rgba(0, 154, 68, 0.10);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-popup::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(0, 154, 68, 0.10);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            font-size: 0.95rem;
+            color: var(--text);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .loading-subtext {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        /* ---------- MAIN CARD ---------- */
+        .main-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 32px 24px;
+            margin-bottom: 28px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 154, 68, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .main-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* KCB brand stripe – brighter green + red */
+        .main-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #009a44 0%, #33b864 40%, #c8102e 70%, #009a44 100%);
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        }
+
+        .loan-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .loan-amount {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 12px 0;
+            position: relative;
+            display: inline-block;
+        }
+
+        .loan-amount::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent 0%, var(--primary-light) 50%, transparent 100%);
+            border-radius: 2px;
+        }
+
+        .loan-subtext {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin: 20px 0 28px;
+            line-height: 1.5;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .feature {
+            background: linear-gradient(135deg, rgba(0, 154, 68, 0.05) 0%, rgba(51, 184, 100, 0.05) 100%);
+            border-radius: 14px;
+            padding: 18px 12px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid rgba(0, 154, 68, 0.08);
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .feature:hover {
+            background: linear-gradient(135deg, rgba(0, 154, 68, 0.10) 0%, rgba(51, 184, 100, 0.10) 100%);
+            transform: translateY(-2px);
+        }
+
+        .feature i {
+            color: var(--primary);
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        /* ---------- CTA ---------- */
+        .cta-section {
+            margin: 32px 0;
+            position: relative;
+        }
+
+        .btn-apply {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--card-bg);
+            border: none;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(0, 154, 68, 0.35);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-apply::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.20), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn-apply:hover::after {
+            left: 100%;
+        }
+
+        .btn-apply:active {
+            transform: scale(0.98);
+            box-shadow: 0 4px 14px rgba(0, 154, 68, 0.30);
+        }
+
+        .btn-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-apply i {
+            transition: transform 0.3s ease;
+        }
+
+        .btn-apply:hover i {
+            transform: translateX(4px);
+        }
+
+        /* ---------- TRUST ---------- */
+        .trust-section {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 154, 68, 0.08);
+            margin-top: 8px;
+        }
+
+        .trust-title {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text);
+            margin-bottom: 20px;
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .trust-title::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 30%;
+            right: 30%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, var(--primary) 50%, transparent 100%);
+        }
+
+        .trust-badges {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .trust-badge {
+            background: linear-gradient(135deg, rgba(0, 154, 68, 0.05) 0%, rgba(51, 184, 100, 0.05) 100%);
+            padding: 14px 10px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+            border: 1px solid rgba(0, 154, 68, 0.08);
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .trust-badge:hover {
+            background: linear-gradient(135deg, rgba(0, 154, 68, 0.10) 0%, rgba(51, 184, 100, 0.10) 100%);
+            transform: translateY(-2px);
+        }
+
+        .trust-badge i {
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        .trust-note {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 20px;
+            font-weight: 500;
+            padding-top: 16px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .trust-note::before {
+            content: "🏦 ";
+            margin-right: 4px;
+        }
+
+        /* ---------- FOOTER ---------- */
+        .footer {
+            text-align: center;
+            margin-top: 28px;
+            padding: 16px 0;
+            color: var(--text-light);
+            font-size: 0.75rem;
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 360px) {
+            .container {
+                padding: 0 12px;
+            }
+
+            .main-card {
+                padding: 24px 20px;
+            }
+
+            .loan-amount {
+                font-size: 1.8rem;
+            }
+
+            .features {
+                gap: 10px;
+            }
+
+            .feature {
+                padding: 16px 8px;
+                font-size: 0.75rem;
+            }
+
+            .trust-badge {
+                font-size: 0.7rem;
+                padding: 12px 8px;
+            }
+
+            .loading-popup {
+                max-width: 260px;
+                padding: 28px 20px;
+            }
+
+            .logo-text {
+                font-size: 1.6rem;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .loan-amount {
+                font-size: 1.6rem;
+            }
+
+            .feature i {
+                font-size: 1.1rem;
+            }
+
+            .btn-apply {
+                padding: 16px;
+                font-size: 0.95rem;
+            }
+
+            .logo-text {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- HEADER -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-text">NYOTA</span>
+            </div>
+            <p class="tagline">Your Trusted Financial Partner</p>
+        </header>
+
+        <!-- LOADING POPUP OVERLAY -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-popup">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Processing Your Request</p>
+                <p class="loading-subtext">Please wait while we verify your eligibility...</p>
+            </div>
+        </div>
+
+        <!-- MAIN CARD -->
+        <div class="main-card">
+            <div class="loan-label">Available Loan Amount</div>
+            <div class="loan-amount">Ksh. 1,000 – 100,000</div>
+            <p class="loan-subtext">Affordable financing for Kenyan youth &amp; entrepreneurs</p>
+
+            <div class="features">
+                <div class="feature">
+                    <i class="fas fa-bolt"></i>
+                    <span>Fast Approval</span>
+                </div>
+
+                <div class="feature">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span>Paperless Process</span>
+                </div>
+
+                <div class="feature">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secure &amp; Safe</span>
+                </div>
+
+                <div class="feature">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <span>Flexible Terms</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta-section">
+            <button class="btn-apply" id="applyButton">
+                <span class="btn-content">
+                    Start Application <i class="fas fa-arrow-right"></i>
+                </span>
+            </button>
+        </div>
+
+        <!-- TRUST SECTION -->
+        <div class="trust-section">
+            <h3 class="trust-title">Your Security &amp; Trust</h3>
+
+            <div class="trust-badges">
+                <div class="trust-badge">
+                    <i class="fas fa-lock"></i>
+                    <span>SSL Secured</span>
+                </div>
+
+                <div class="trust-badge">
+                    <i class="fas fa-certificate"></i>
+                    <span>Licensed Lender</span>
+                </div>
+
+                <div class="trust-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Data Protected</span>
+                </div>
+
+                <div class="trust-badge">
+                    <i class="fas fa-users"></i>
+                    <span>Trusted Partner</span>
+                </div>
+            </div>
+
+            <p class="trust-note">Empowering thousands of Kenyans with fast, fair loans</p>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>&copy; 2024 NYOTA. All rights reserved.</p>
+            <p>Need help? <a href="mailto:support@kcb.co.ke">Contact Support</a></p>
+        </div>
+
+    </div>
+
+    <script>
+        document.getElementById('applyButton').addEventListener('click', function() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.style.display = 'flex';
+
+            setTimeout(function() {
+                loadingOverlay.style.display = 'none';
+                window.location.href = 'eligibility.html';
+            }, 2000);
+        });
+
+        // Touch feedback for features & badges
+        document.querySelectorAll('.feature, .trust-badge').forEach(function(item) {
+            item.addEventListener('touchstart', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+
+            item.addEventListener('touchend', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Ensure loading overlay is hidden on load
+        window.addEventListener('load', function() {
+            var overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.style.display = 'none';
+        });
+
+        // Also hide on page show (back/forward cache)
+        window.addEventListener('pageshow', function() {
+            var overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.style.display = 'none';
+        });
+    </script>
+
+</body>
+
+</html>

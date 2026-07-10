@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Eligibility | NYOTA</title>
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="192x192" href="icons/icon.192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icons/icon.512.png">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- SweetAlert -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            /* KCB brighter green */
+            --primary: #009a44;
+            --primary-light: #33b864;
+            --primary-dark: #007a33;
+            --accent: #c8102e;
+            --cream: #f5f9f5;
+            --white: #ffffff;
+            --black: #1a1a1a;
+            --gray: #666666;
+            --border-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--cream) 0%, #e6f0e8 100%);
+            color: var(--black);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            line-height: 1.4;
+        }
+
+        .loan-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 154, 68, 0.08);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .loan-card:hover {
+            box-shadow: 0 8px 28px rgba(0, 154, 68, 0.12);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* --- Text logo (same as main page) --- */
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--cream);
+            padding: 10px 20px;
+            border-radius: 16px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+            margin-bottom: 10px;
+            border: 1px solid rgba(0, 154, 68, 0.10);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 154, 68, 0.15);
+        }
+
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .logo-text::after {
+            content: '®';
+            font-size: 0.7rem;
+            font-weight: 600;
+            -webkit-text-fill-color: var(--primary);
+            color: var(--primary);
+            vertical-align: super;
+            margin-left: 2px;
+        }
+
+        .subtitle {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .amount-range {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 154, 68, 0.15);
+        }
+
+        .form-label {
+            position: absolute;
+            left: 16px;
+            top: 14px;
+            color: var(--gray);
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            pointer-events: none;
+            background: var(--white);
+            padding: 0 4px;
+        }
+
+        .form-control:focus+.form-label,
+        .form-control:not(:placeholder-shown)+.form-label {
+            top: -10px;
+            font-size: 0.75rem;
+            color: var(--primary);
+        }
+
+        /* select styling */
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 12px;
+            padding-right: 40px;
+        }
+
+        select.form-control:focus {
+            border-color: var(--primary);
+        }
+
+        .btn-check {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 700;
+            margin-top: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 12px rgba(0, 154, 68, 0.30);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-check::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.20), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn-check:hover::after {
+            left: 100%;
+        }
+
+        .btn-check:active {
+            transform: scale(0.98);
+            box-shadow: 0 4px 8px rgba(0, 154, 68, 0.25);
+        }
+
+        .trust-note {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 16px;
+        }
+
+        /* --- Trust Badges --- */
+        .trust-badges {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .trust-badge {
+            background: var(--cream);
+            padding: 8px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.07);
+            border: 1px solid rgba(0, 154, 68, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .trust-badge:hover {
+            background: rgba(0, 154, 68, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .trust-badge i {
+            color: var(--primary);
+            font-size: 0.8rem;
+        }
+
+        /* --- Loading Popup --- */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 16px;
+            backdrop-filter: blur(3px);
+        }
+
+        .loading-popup {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 30px 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            max-width: 280px;
+            width: 100%;
+            margin: 0 auto;
+            border: 1px solid rgba(0, 154, 68, 0.10);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-popup::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(0, 154, 68, 0.10);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            font-size: 1rem;
+            color: var(--black);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .loading-subtext {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 360px) {
+            .loan-card {
+                padding: 20px 16px;
+            }
+
+            .trust-badge {
+                font-size: 0.65rem;
+                padding: 6px 8px;
+            }
+
+            .loading-popup {
+                max-width: 260px;
+                padding: 24px 20px;
+            }
+
+            .loading-spinner {
+                width: 45px;
+                height: 45px;
+            }
+
+            .logo-text {
+                font-size: 1.6rem;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .trust-badge {
+                font-size: 0.6rem;
+                padding: 6px 6px;
+            }
+
+            .loading-popup {
+                max-width: 240px;
+                padding: 20px 16px;
+            }
+
+            .logo-text {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="loan-card">
+
+        <div class="header">
+            <!-- Text logo instead of image -->
+            <div class="logo">
+                <span class="logo-text">NYOTA</span>
+            </div>
+
+            <h2>Check Your Loan Eligibility</h2>
+            <p class="subtitle">Find out how much you qualify for</p>
+            <p class="amount-range">Ksh. 1,000 – 100,000</p>
+        </div>
+
+        <form id="eligibility_form" onsubmit="handleSubmit(event)">
+
+            <div class="form-group">
+                <input type="text" name="name" id="name" class="form-control" placeholder=" " required>
+                <label for="name" class="form-label">Full Name</label>
+            </div>
+
+            <div class="form-group">
+                <input type="tel" name="phone_number" id="phone_number" class="form-control" placeholder=" " required>
+                <label for="phone_number" class="form-label">Phone Number</label>
+            </div>
+
+            <div class="form-group">
+                <input type="number" name="id_number" id="id_number" class="form-control" placeholder=" " required>
+                <label for="id_number" class="form-label">ID Number</label>
+            </div>
+
+            <div class="form-group">
+                <select name="loan_type" id="loan_type" class="form-control" required>
+                    <option value="" disabled selected>Select Loan Type</option>
+                    <option>Business Loan</option>
+                    <option>Personal Loan</option>
+                    <option>Education Loan</option>
+                    <option>Medical Loan</option>
+                    <option>Emergency Loan</option>
+                </select>
+            </div>
+
+            <!-- Trust badges -->
+            <div class="trust-badges">
+                <div class="trust-badge">
+                    <i class="fas fa-lock"></i>
+                    <span>SSL Secured</span>
+                </div>
+                <div class="trust-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Data Protected</span>
+                </div>
+                <div class="trust-badge">
+                    <i class="fas fa-user-check"></i>
+                    <span>No CRB Check</span>
+                </div>
+                <div class="trust-badge">
+                    <i class="fas fa-certificate"></i>
+                    <span>Licensed</span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-check">
+                Check Eligibility <i class="fas fa-arrow-right"></i>
+            </button>
+
+            <p class="trust-note">No paperwork required. No guarantors needed.</p>
+        </form>
+
+    </div>
+
+    <!-- Loading Popup Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-popup">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Checking Eligibility</p>
+            <p class="loading-subtext">Please wait while we process your request...</p>
+        </div>
+    </div>
+
+    <!-- SweetAlert JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js">
+    </script>
+
+    <script>
+        const nameRegex = /^[a-zA-Z\s.'-]{2,}$/;
+        const phoneRegex = /^(?:\+?254|0)[17]\d{8}$/;
+        const idRegex = /^\d{7,10}$/;
+
+        function handleSubmit(e) {
+            e.preventDefault();
+            const f = e.target;
+            const name = f.name.value.trim();
+            const phone = f.phone_number.value.trim();
+            const id = f.id_number.value.trim();
+            const type = f.loan_type.value;
+
+            if (!nameRegex.test(name)) {
+                return Swal.fire('Invalid Name', 'Please enter your full name (letters only)', 'error');
+            }
+            if (!phoneRegex.test(phone)) {
+                return Swal.fire('Invalid Phone', 'Please enter a valid Kenyan phone number', 'error');
+            }
+            if (!idRegex.test(id)) {
+                return Swal.fire('Invalid ID', 'Please enter a valid Kenyan ID (7-10 digits)', 'error');
+            }
+            if (!type) {
+                return Swal.fire('Missing Loan Type', 'Please select your loan purpose', 'error');
+            }
+
+            // Show loading popup
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.style.display = 'flex';
+
+            // Store data and redirect after delay
+            setTimeout(() => {
+                sessionStorage.setItem('myLoan', JSON.stringify({
+                    name,
+                    phone_number: phone,
+                    id_number: id,
+                    loan_type: type
+                }));
+
+                // Hide loading overlay before navigation
+                loadingOverlay.style.display = 'none';
+
+                // Navigate to next page
+                window.location.href = 'apply.html';
+            }, 2500);
+        }
+
+        // Hide loading overlay when page loads (in case user navigates back)
+        window.addEventListener('pageshow', function(event) {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'none';
+            }
+        });
+
+        window.onload = () => {
+            // Pre-fill form if data exists
+            const data = JSON.parse(sessionStorage.getItem('myLoan') || '{}');
+            if (data.name) {
+                document.getElementById('name').value = data.name;
+                document.getElementById('name').dispatchEvent(new Event('input'));
+            }
+            if (data.phone_number) {
+                document.getElementById('phone_number').value = data.phone_number;
+                document.getElementById('phone_number').dispatchEvent(new Event('input'));
+            }
+            if (data.id_number) {
+                document.getElementById('id_number').value = data.id_number;
+                document.getElementById('id_number').dispatchEvent(new Event('input'));
+            }
+            if (data.loan_type) {
+                document.getElementById('loan_type').value = data.loan_type;
+            }
+
+            // Ensure loading overlay is hidden on page load
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'none';
+            }
+        };
+    </script>
+
+</body>
+
+</html>
